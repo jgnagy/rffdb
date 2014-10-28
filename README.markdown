@@ -12,24 +12,29 @@ Usage
 
 Require the right gem(s):
 
+    #!ruby
     require 'rffdb'
   
 The `Yaml` storage engine is included by default. To include additional storage engines (none currently exist), just require them:
 
+    #!ruby
     require 'rffdb/storage_engines/engine_name'
 
 Now you must define a document model. Let's call this model "Product", like we're making an app to sell things:
 
+    #!ruby
     class Product < RubyFFDB::Document
     end
 
 Now that's a pretty lame document, because all it has is an "id" attribute:
 
+    #!ruby
     product = Product.new
     product.id            # => 1
 
 Let's start over, and this time make it better:
 
+    #!ruby
     class Product < RubyFFDB::Document
       attribute :name,        :class => String
       attribute :price,       :class => Float
@@ -39,6 +44,7 @@ Let's start over, and this time make it better:
 
 Now our Product class can do more interesting things, like store data. Yay! Here's how we use it:
 
+    #!ruby
     product = Product.new
     product.name  = "Awesome Sauce 5000"
     product.price = 19.95
@@ -48,15 +54,18 @@ Now our Product class can do more interesting things, like store data. Yay! Here
 
 Now to pull it up later:
 
+    #!ruby
     product = Product.get(1)
     product.price     # => 19.95
 
 If you suspect someone else has written to the file, or that it has otherwise changed since you last loaded it, just refresh it:
 
+    #!ruby
     product.refresh
 
 If you want to make another model that uses a different storage engine, just specify the class when you define the model:
 
+    #!ruby
     class Customer < RubyFFDB::Document
       engine RubyFFDB::StorageEngines::MyAwesomeEngine  # default is RubyFFDB::StorageEngines::Yaml
       
@@ -73,6 +82,7 @@ If you want to make another model that uses a different storage engine, just spe
 
 Whoa, see what just happened? We used a different storage engine, and we validated the format of email addresses! That's right, attributes support specifying a format for Strings using a regular expression. You can also have it execute arbitrary validations (defined in the model class) as long as they're methods that accept a single input: the value you're attempting to set the attribute to:
 
+    #!ruby
     class Payment < RubyFFDB::Document
       attribute :method,  :class => String, :validate => :valid_payment_methods
       attribute :amount, :class => Float
