@@ -1,0 +1,10 @@
+syntax: glob
+
+# Ignore Mac stuff
+.DS_Store
+
+# Ignore temporary stuff
+tmp/
+
+# Ignore built gem files
+*.gem

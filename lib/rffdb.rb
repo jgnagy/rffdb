@@ -1,0 +1,7 @@
+require 'ostruct'
+require 'rffdb/version'
+require 'rffdb/exception'
+require 'rffdb/exceptions/document_exceptions'
+require 'rffdb/storage_engine'
+require 'rffdb/storage_engines/yaml'
+require 'rffdb/document'
