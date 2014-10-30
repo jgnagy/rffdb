@@ -1,6 +1,6 @@
 module RubyFFDB
   module StorageEngines
-    class Yaml < StorageEngine
+    class YamlEngine < StorageEngine
       # TODO add support for sharding since directories will fill up quickly
       require 'yaml'
       def self.store(type, object_id, data)

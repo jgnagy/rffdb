@@ -63,12 +63,12 @@ module RubyFFDB
     
     # Set the StorageEngine class for this Document type
     def self.engine(storage_engine)
-      raise Exceptions::InvalidEngine unless storage_engine.kind_of?(StorageEngine)
+      raise Exceptions::InvalidEngine unless storage_engine.instance_of? Class and storage_engine.ancestors.include?(StorageEngine)
       @engine = storage_engine
     end
     
     def self.storage
-      @engine ||= StorageEngines::Yaml
+      @engine ||= StorageEngines::YamlEngine
       @engine
     end
     
@@ -100,13 +100,13 @@ module RubyFFDB
             valid = self.send(validation.to_sym, args.last)
             raise Exceptions::FailedValidation unless valid
           end
-          @data[key] = args.last if valid
+          @data[key.to_s] = args.last if valid
         else
           raise Exceptions::InvalidInput
         end
         @saved = false
       elsif structure.has_key?(key)
-        @data[key]
+        @data[key.to_s]
       else
         super
       end

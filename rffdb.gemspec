@@ -14,9 +14,11 @@ Gem::Specification.new do |s|
     "lib/rffdb/exception.rb",
     "lib/rffdb/exceptions/document_exceptions.rb",
     "lib/rffdb/storage_engine.rb",
-    "lib/rffdb/storage_engines/yaml.rb",
+    "lib/rffdb/storage_engines/yaml_engine.rb",
+    "lib/rffdb/storage_engines/json_engine.rb",
     "lib/rffdb/document.rb",
-    "lib/rffdb/version.rb"
+    "lib/rffdb/version.rb",
+    "LICENSE"
   ]
   s.license     = 'MIT'
 end

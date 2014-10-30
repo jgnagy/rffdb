@@ -3,7 +3,7 @@ Ruby Flat File DB
 
 About
 -----
-This is a really horrible idea for anything requiring high performance, but it is a pretty good way to demonstrate how to create a gem and simple framework in Ruby. This is meant to emulate ActiveRecord or DataMapper, without all the performance, scalabilty, and thread-safety concerns, and meant to be used with really poor database storage formats, like YAML. **Pay attention to this:** This is a demonstration of Ruby and frameworks, and not to be used in any kind of production environment.
+This is a really horrible idea for anything requiring high performance, but it is a pretty good way to demonstrate how to create a gem and simple framework in Ruby. This is meant to emulate ActiveRecord or DataMapper, without all the performance, scalabilty, and thread-safety concerns, and meant to be used with really poor database storage formats, like YAML or JSON. **Pay attention to this:** This is a demonstration of Ruby and frameworks, and not to be used in any kind of production environment.
 
 The gem is currently built around the concepts of "documents" and "storage engines". The rffdb gem is built to allow defining and choosing "storage engines" per database model. Database models are subclasses of the `Document` class, and storage engines are subclasses of the `StorageEngine` class.
 
@@ -15,10 +15,10 @@ Require the right gem(s):
     #!ruby
     require 'rffdb'
   
-The `Yaml` storage engine is included by default. To include additional storage engines (none currently exist), just require them:
+The `YamlEngine` storage engine is included by default. To include additional storage engines (like the JSON engine), just require them:
 
     #!ruby
-    require 'rffdb/storage_engines/engine_name'
+    require 'rffdb/storage_engines/json_engine'
 
 Now you must define a document model. Let's call this model "Product", like we're making an app to sell things:
 
@@ -67,7 +67,7 @@ If you want to make another model that uses a different storage engine, just spe
 
     #!ruby
     class Customer < RubyFFDB::Document
-      engine RubyFFDB::StorageEngines::MyAwesomeEngine  # default is RubyFFDB::StorageEngines::Yaml
+      engine RubyFFDB::StorageEngines::MyAwesomeEngine  # default is RubyFFDB::StorageEngines::YamlEngine
       
       attribute :address,       :class => String
       attribute :first_name,    :class => String
