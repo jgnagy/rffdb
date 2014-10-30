@@ -21,21 +21,27 @@ module RubyFFDB
     end
     
     def self.cache_size(type, size)
-      @cache_sizes ||= {}
-      @cache_sizes[type] = size
+      @caches ||= {}
+      @caches[type] ||= LRUCache.new(size)
+      @caches[type] = LRUCache.new(size) unless @caches[type].size == size
     end
     
     def self.cache_lookup(type, object_id)
-      @cache ||= {}
-      @cache[type] ||= OpenStruct.new
-      return @cache[type][(type.to_s + object_id.to_s).to_sym]
+      @caches ||= {}
+      @caches[type] ||= LRUCache.new
+      @caches[type][object_id.to_s]
     end
     
     def self.cache_store(type, object_id, data)
-      @cache ||= {}
-      @cache[type] ||= OpenStruct.new
-      @cache[type][(type.to_s + object_id.to_s).to_sym] = data
+      @caches ||= {}
+      @caches[type] ||= LRUCache.new
+      @caches[type][object_id.to_s] = data
       return true
+    end
+    
+    def self.cache(type)
+      @caches ||= {}
+      @caches[type] ||= LRUCache.new
     end
   end
 end

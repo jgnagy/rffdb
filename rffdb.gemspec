@@ -12,7 +12,9 @@ Gem::Specification.new do |s|
   s.files       = [
     "lib/rffdb.rb",
     "lib/rffdb/exception.rb",
+    "lib/rffdb/exceptions/cache_exceptions.rb",
     "lib/rffdb/exceptions/document_exceptions.rb",
+    "lib/rffdb/lru_cache.rb",
     "lib/rffdb/storage_engine.rb",
     "lib/rffdb/storage_engines/yaml_engine.rb",
     "lib/rffdb/storage_engines/json_engine.rb",

@@ -29,10 +29,6 @@ module RubyFFDB
         return result
       end
 
-      def self.flush
-        @cache[type] = OpenStruct.new
-      end
-
       def self.next_id(type)
         # lists the files in the directory and grabs the next id
         directory_glob = Dir.glob(File.join(File.dirname(file_path(type, 0)), "*.json"))
