@@ -22,7 +22,7 @@ module RubyFFDB
         rescue => e
           puts e.message
         end
-        return result
+        return result.dup
       end
 
       def self.next_id(type)
