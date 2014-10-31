@@ -12,7 +12,7 @@ module RubyFFDB
         cache_store(type, object_id, data)
         return true
       end
-      
+
       def self.retrieve(type, object_id, use_caching = true)
         result = nil
         begin
@@ -38,7 +38,7 @@ module RubyFFDB
           return 1
         end
       end
-      
+
       def self.file_path(type, object_id)
         File.join(type.to_s.gsub('::', "__"), 'documents', object_id.to_s + ".json")
       end

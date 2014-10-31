@@ -38,7 +38,7 @@ module RubyFFDB
     def committed?
       return @saved
     end
-    
+
     # Retrieve the stored data from disk, never using cache. Allows forcing to overwrite uncommitted changes.
     def reload(force = false)
       if committed? or force
@@ -48,7 +48,7 @@ module RubyFFDB
       end
       @saved = true
     end
-    
+
     # Overwrites the document's data, either from disk or from cache. Useful for lazy-loading and not
     # typically used directly. Since data might have been pulled from cache, this can lead to bizarre
     # things if not used carefully and things rely on #committed? or @saved.
@@ -56,13 +56,13 @@ module RubyFFDB
       @data = storage.retrieve(self.class, @document_id)
       @saved = true
     end
-    
+
     def self.load(id)
       return self.new(id)
     end
-    
+
     self.singleton_class.send(:alias_method, :get, :load)
-    
+
     def self.attribute(name, options = {})
       @structure ||= {}
       @structure[name.to_sym] = {}
@@ -71,35 +71,35 @@ module RubyFFDB
       @structure[name.to_sym][:format]  = options.has_key?(:format) ? options[:format] : nil
       @structure[name.to_sym][:validations] = options.has_key?(:validate) ? [*options[:validate]] : []
     end
-    
+
     # Set the StorageEngine class for this Document type
     def self.engine(storage_engine)
       raise Exceptions::InvalidEngine unless storage_engine.instance_of? Class and storage_engine.ancestors.include?(StorageEngine)
       @engine = storage_engine
     end
-    
+
     def self.storage
       @engine ||= StorageEngines::YamlEngine
       @engine
     end
-    
+
     def storage
       self.class.send(:storage)
     end
-    
+
     def self.structure
       @structure ||= {}
       @structure.dup
     end
-    
+
     def structure
       self.class.send(:structure)
     end
-    
+
     def self.cache_size(size)
       storage.cache_size(self, size)
     end
-    
+
     def self.cache
       storage.cache(self)
     end
