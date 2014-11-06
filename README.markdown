@@ -12,6 +12,7 @@ Building
 
 The eventual goal is for this gem to simply be available via a normal rubygems search, but until then, you must build and install the gem yourself. This can be done like so:
 
+    #!bash
     # need Mercurial to clone the repo... or download it from https://bitbucket.org/jgnagy/rffdb/get/tip.zip
     hg clone https://bitbucket.org/jgnagy/rffdb
     cd rffdb
