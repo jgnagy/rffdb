@@ -7,6 +7,21 @@ This is a really horrible idea for anything requiring high performance, but it i
 
 The gem is currently built around the concepts of "documents" and "storage engines". The rffdb gem is built to allow defining and choosing "storage engines" per database model. Database models are subclasses of the `Document` class, and storage engines are subclasses of the `StorageEngine` class.
 
+Building
+-----
+
+The eventual goal is for this gem to simply be available via a normal rubygems search, but until then, you must build and install the gem yourself. This can be done like so:
+
+    # need Mercurial to clone the repo... or download it from https://bitbucket.org/jgnagy/rffdb/get/tip.zip
+    hg clone https://bitbucket.org/jgnagy/rffdb
+    cd rffdb
+    # highly recommend using RVM here, and Ruby 2.x or above
+    gem build rffdb.gemspec
+    # install what you just built
+    gem install ./rffdb-*.gem
+
+Sometimes you might get lucky and there's a semi-recent version of the pre-built gem available on bitbucket [here](https://bitbucket.org/jgnagy/rffdb/downloads).
+
 Usage
 -----
 
