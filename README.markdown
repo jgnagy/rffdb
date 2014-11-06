@@ -7,6 +7,8 @@ This is a really horrible idea for anything requiring high performance, but it i
 
 The gem is currently built around the concepts of "documents" and "storage engines". The rffdb gem is built to allow defining and choosing "storage engines" per database model. Database models are subclasses of the `Document` class, and storage engines are subclasses of the `StorageEngine` class.
 
+Some interesting concepts have been introduced (mostly to experiment), such as lazy-loading of model data, a caching layer between model instances and their persistent storage (a simple LRU Cache per model as an instance of `RubyFFDB::LRUCache`, of course), with more to come. I plan on eventually adding thread-safety through the use of more singletons, with a semaphore or mutex around the persistent storage (with a non-blocking storage pool as an eventual option), indexes and other metadata, full-text search, and maybe someday an embedded web service for serving up the FFDB.
+
 Building
 -----
 
@@ -119,3 +121,24 @@ License
 -------
 
 RubyFFDB is distributed under the MIT License
+
+To Do
+-----
+
+* YARD documentation on everything
+* Thread-safety
+  * Add mutex / locking at the model level (like table-level locking) for writing to disk
+  * Add mutex / locking at the model level for writing to cache
+* Thread-pool for non-blocking / asynchronous writing to disk (must be optional and default to disabled)
+* Indexing of columns, defined at model
+* Full-text searchable fields, configured on model
+* Write a method for clearing cache (globally and at the Model level) and invalidating individual instances (at the instance level)
+* Add a way of disabling lazy-loading of data from disk at the model level
+  * Maybe make this a generic "engine options" DSL method
+
+Contributing
+------------
+
+Honestly, the point of this framework is for my own personal growth and learning. I'm trying hard to build the features I want into the framework without relying on the guts of other tools. I clearly rip off the methods exposed my other tools (meaning I'm designing a framework that you can interact with in a familiar way), but I'm trying to do it without knowing _how_ others did it.
+
+That said, I welcome pull-requests. I may or may not use your code, but I encourage the growth of others too. If this project inspires you to contribute, feel free to fork my code and submit a pull request. If you're okay with the MIT license and you're open to me shamelessly claiming your code as my own (it'd have to be a pretty amazing contribution for your name to show up anywhere but the commit history), go for it.
