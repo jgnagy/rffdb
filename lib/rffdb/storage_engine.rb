@@ -19,6 +19,10 @@ module RubyFFDB
     def self.file_path(type, object_id)
       false
     end
+    
+    def self.all(type)
+      []
+    end
 
     def self.cache_size(type, size)
       @caches ||= {}

@@ -25,16 +25,19 @@ module RubyFFDB
         return result.dup # Return a duplicate to support caching
       end
 
-      def self.next_id(type)
-        # lists the files in the directory and grabs the next id
+      # Lazily grab all document ids in use
+      def self.all(type)
         directory_glob = Dir.glob(File.join(File.dirname(file_path(type, 0)), "*.yml"))
         if directory_glob and !directory_glob.empty?
-          return Integer(File.basename(directory_glob.sort {|a,b|
-            Integer(a.match(/([0-9]+)\.yml$/)[1]) <=> Integer(b.match(/([0-9]+)\.yml$/)[1]) 
-          }.last, ".yml")) + 1
+          directory_glob.map {|doc| Integer(File.basename(doc, ".yml"))}.sort
         else
-          return 1
+          []
         end
+      end
+
+      def self.next_id(type)
+        last_id = all(type)[-1]
+        last_id.nil? ? 1 : (last_id + 1)
       end
 
       def self.file_path(type, object_id)

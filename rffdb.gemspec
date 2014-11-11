@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
     "lib/rffdb/storage_engines/yaml_engine.rb",
     "lib/rffdb/storage_engines/json_engine.rb",
     "lib/rffdb/document.rb",
+    "lib/rffdb/document_collection.rb",
     "lib/rffdb/version.rb",
     "LICENSE"
   ]
