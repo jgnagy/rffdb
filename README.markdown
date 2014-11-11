@@ -7,7 +7,7 @@ This is a really horrible idea for anything requiring high performance, but it i
 
 The gem is currently built around the concepts of "documents" and "storage engines". The rffdb gem is built to allow defining and choosing "storage engines" per database model. Database models are subclasses of the `Document` class, and storage engines are subclasses of the `StorageEngine` class.
 
-Some interesting concepts have been introduced (mostly to experiment), such as lazy-loading of model data, a caching layer between model instances and their persistent storage (a simple LRU Cache per model as an instance of `RubyFFDB::LRUCache`, of course), with more to come. I plan on eventually adding thread-safety through the use of more singletons, with a semaphore or mutex around the persistent storage (with a non-blocking storage pool as an eventual option), indexes and other metadata, full-text search, and maybe someday an embedded web service for serving up the FFDB.
+Some interesting concepts have been introduced (mostly to experiment), such as lazy-loading of model data, a caching layer between model instances and their persistent storage (a simple LRU Cache per model as an instance of `RubyFFDB::CacheProviders::LRUCache`, of course), with more to come. I plan on eventually adding thread-safety through the use of more singletons, with a semaphore or mutex around the persistent storage (with a non-blocking storage pool as an eventual option), indexes and other metadata, full-text search, and maybe someday an embedded web service for serving up the FFDB.
 
 Building
 -----
