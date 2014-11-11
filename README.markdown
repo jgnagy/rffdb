@@ -139,6 +139,6 @@ To Do
 Contributing
 ------------
 
-Honestly, the point of this framework is for my own personal growth and learning. I'm trying hard to build the features I want into the framework without relying on the guts of other tools. I clearly rip off the methods exposed my other tools (meaning I'm designing a framework that you can interact with in a familiar way), but I'm trying to do it without knowing _how_ others did it.
+Honestly, the point of this framework is for my own personal growth and learning. I'm trying hard to build the features I want into the framework without relying on the guts of other tools. I clearly rip off the methods exposed by other tools (meaning I'm designing a framework that you can interact with in a familiar way), but I'm trying to do it without knowing _how_ others did it.
 
 That said, I welcome pull-requests. I may or may not use your code, but I encourage the growth of others too. If this project inspires you to contribute, feel free to fork my code and submit a pull request. If you're okay with the MIT license and you're open to me shamelessly claiming your code as my own (it'd have to be a pretty amazing contribution for your name to show up anywhere but the commit history), go for it.

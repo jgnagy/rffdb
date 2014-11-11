@@ -1,6 +1,7 @@
 module RubyFFDB
   class Document
 
+    # @raise [Exceptions::NoSuchDocument] when attempting to retrieve a non-existing document by id
     def initialize(existing_id = false, lazy = true)
       if existing_id
         @document_id  = existing_id
@@ -20,14 +21,20 @@ module RubyFFDB
       end
     end
 
+    # Overrides the Object#id method to deliver an id derived from this document's storage engine
+    # @return [Fixnum] the object id from the storage engine
     def id
       @document_id
     end
 
+    # The location of the flat-file
+    # @return [String] the path to the flat-file used to store this document (may not exist yet)
     def file_path
       storage.file_path(self.class, @document_id)
     end
 
+    # Commit the document to storage
+    # @return [Boolean]
     def commit
       storage.store(self.class, @document_id, @data.dup) unless @saved
       @saved = true
@@ -35,11 +42,14 @@ module RubyFFDB
 
     alias_method :save, :commit
 
+    # Has this documented been committed to storage?
+    # @return [Boolean]
     def committed?
       return @saved
     end
 
     # Retrieve the stored data from disk, never using cache. Allows forcing to overwrite uncommitted changes.
+    # @raise [Exceptions::PendingChanges] if attempting to reload with uncommitted changes (and if `force` is false)
     def reload(force = false)
       if committed? or force
         @data = storage.retrieve(self.class, @document_id, false)
@@ -57,53 +67,77 @@ module RubyFFDB
       @saved = true
     end
 
+    # Currently an alias for #new, but used as a wrapper in case more work needs to be done
+    # before pulling a document from the storage engine (such as sanitizing input, etc)
     def self.load(id)
       return self.new(id)
     end
 
     self.singleton_class.send(:alias_method, :get, :load)
 
+    # This method is used to define the schema for a document. It sets up all data access for the class,
+    # and allows specifying strict checks on that schema during its use, such as validations, class types, regexp
+    # formatting, etc.
+    #
+    # @param name [Symbol] the unique name of the attribute
+    # @option options [Class] :class (Object) the expected object class for this attribute
+    # @option options [Regexp] :format a regular expression for the required format of the attribute (for any :class that supports #.to_s)
+    # @option options [Array, Symbol] :validate either a symbol or array of symbols referencing the instance method(s) to use to validate this attribute
     def self.attribute(name, options = {})
       @structure ||= {}
       @structure[name.to_sym] = {}
-      # These aren't implemented yet...
+      # setup the schema
       @structure[name.to_sym][:class]   = options.has_key?(:class) ? options[:class] : Object
       @structure[name.to_sym][:format]  = options.has_key?(:format) ? options[:format] : nil
       @structure[name.to_sym][:validations] = options.has_key?(:validate) ? [*options[:validate]] : []
     end
 
     # Set the StorageEngine class for this Document type
+    # @raise [Exceptions::InvalidEngine] if the specified {StorageEngine} does not exist
     def self.engine(storage_engine)
       raise Exceptions::InvalidEngine unless storage_engine.instance_of? Class and storage_engine.ancestors.include?(StorageEngine)
       @engine = storage_engine
     end
 
+    # @return [StorageEngine] a reference to the storage engine singleton of this document class
     def self.storage
       @engine ||= StorageEngines::YamlEngine
       @engine
     end
 
+    # @return [StorageEngine] a reference to the storage engine singleton of this document class
     def storage
       self.class.send(:storage)
     end
 
+    # @return [Hash] a copy of the schema information for this class
     def self.structure
       @structure ||= {}
       @structure.dup
     end
 
+    # @return [Hash] a copy of the schema information for this class
     def structure
       self.class.send(:structure)
     end
 
+    # Sets the maximum number of entries the cache instance for this document will hold.
+    # Note, this clears the current contents of the cache.
+    # @param size [Fixnum] the maximum size of this class' cache instance
     def self.cache_size(size)
       storage.cache_size(self, size)
     end
 
+    # Allow direct access to the cache instance of this document class
+    # @return [LRUCache] this class' cache instance
     def self.cache
       storage.cache(self)
     end
 
+    # Uses the defined schema to setup getter and setter methods. Runs validations,
+    # format checking, and type checking on setting methods.
+    # @raise [Exceptions::FailedValidation] if validation of an attribute fails while setting
+    # @raise [Exceptions::InvalidInput] if, while setting, an attribute fails to conform to the type or format defined in the schema
     def method_missing(method, *args, &block)
       setter  = method.to_s.match(/.*=$/) ? true : false
       key     = setter ? method.to_s.match(/(.*)=$/)[1].to_sym : method.to_s.to_sym
