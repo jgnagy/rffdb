@@ -19,6 +19,8 @@ module RubyFFDB
         # relative to database root
         @saved = false
       end
+      @read_lock  = Mutex.new
+      @write_lock = Mutex.new
     end
 
     # Overrides the Object#id method to deliver an id derived from this document's storage engine
@@ -36,8 +38,12 @@ module RubyFFDB
     # Commit the document to storage
     # @return [Boolean]
     def commit
-      storage.store(self.class, @document_id, @data.dup) unless @saved
-      @saved = true
+      @read_lock.synchronize do
+        @write_lock.synchronize do
+          storage.store(self.class, @document_id, @data.dup) unless @saved
+          @saved = true
+        end
+      end
     end
 
     alias_method :save, :commit
@@ -52,19 +58,27 @@ module RubyFFDB
     # @raise [Exceptions::PendingChanges] if attempting to reload with uncommitted changes (and if `force` is false)
     def reload(force = false)
       if committed? or force
-        @data = storage.retrieve(self.class, @document_id, false)
+        @read_lock.synchronize do
+          @write_lock.synchronize do
+            @data = storage.retrieve(self.class, @document_id, false)
+          end
+        end
       else
         raise Exceptions::PendingChanges
       end
-      @saved = true
+      @read_lock.synchronize do
+        @write_lock.synchronize { @saved = true }
+      end
     end
 
     # Overwrites the document's data, either from disk or from cache. Useful for lazy-loading and not
     # typically used directly. Since data might have been pulled from cache, this can lead to bizarre
     # things if not used carefully and things rely on #committed? or @saved.
     def refresh
-      @data = storage.retrieve(self.class, @document_id)
-      @saved = true
+      @write_lock.synchronize do
+        @data = storage.retrieve(self.class, @document_id)
+        @saved = true
+      end
     end
 
     # Currently an alias for #new, but used as a wrapper in case more work needs to be done
@@ -155,15 +169,21 @@ module RubyFFDB
             valid = self.send(validation.to_sym, args.last)
             raise Exceptions::FailedValidation unless valid
           end
-          refresh if @lazy and committed? # here is where the lazy-loading happens
-          @data[key.to_s] = args.last if valid
+          refresh if @read_lock.synchronize { @lazy } and @read_lock.synchronize { committed? } # here is where the lazy-loading happens
+          @read_lock.synchronize do
+            @write_lock.synchronize do
+              @data[key.to_s] = args.last if valid
+            end
+          end
         else
           raise Exceptions::InvalidInput
         end
         @saved = false
       elsif structure.has_key?(key)
-        refresh if @lazy and committed? # here is where the lazy-loading happens
-        @data[key.to_s]
+        refresh if @read_lock.synchronize { @lazy } and @read_lock.synchronize { committed? } # here is where the lazy-loading happens
+        @read_lock.synchronize do
+          @data[key.to_s]
+        end
       else
         super
       end

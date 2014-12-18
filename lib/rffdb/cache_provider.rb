@@ -1,5 +1,5 @@
 module RubyFFDB
-  # Generic Cache Provider definition. Any subclass *must* implement the methods defined here.
+  # Generic Cache Provider definition. Any subclass *must* implement or inherit the methods defined here (if any).
   class CacheProvider
     # Used for pulling data from the cache
     def [](key)
