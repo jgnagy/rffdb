@@ -9,6 +9,9 @@ module RubyFFDB
     class InvalidInput < Exception
     end
 
+    class InvalidWhereQuery < Exception
+    end
+
     class NoSuchDocument < Exception
     end
 

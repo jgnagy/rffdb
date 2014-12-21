@@ -170,6 +170,12 @@ module RubyFFDB
       DocumentCollection.new(storage.all(self).collect {|doc_id| load(doc_id)}, self)
     end
 
+    # Query for Documents based on an attribute
+    # @see DocumentCollection#where
+    def self.where(attribute, value, comparison_method = "==")
+      all.where(attribute, value, comparison_method)
+    end
+
     # Uses the defined schema to setup getter and setter methods. Runs validations,
     # format checking, and type checking on setting methods.
     # @raise [Exceptions::FailedValidation] if validation of an attribute fails while setting

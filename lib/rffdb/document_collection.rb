@@ -44,5 +44,29 @@ module RubyFFDB
         @list[index]
       end
     end
+
+    # Allow complex sorting like an Array
+    # @return [DocumentCollection] sorted collection
+    def sort(&block)
+      self.class.new(super(&block), @type)
+    end
+
+    # Horribly inefficient way to allow querying Documents by their attributes.
+    # This method can be chained for multiple / more specific queries.
+    #
+    # @param attribute [Symbol] the attribute to query
+    # @param value [Object] the value to compare against
+    # @param comparison_method [String,Symbol] the method to use for comparison - allowed options are "'==', '>', '>=', '<', '<=', and 'match'"
+    # @raise [Exceptions::InvalidWhereQuery] if not the right kind of comparison
+    # @return [DocumentCollection]
+    def where(attribute, value, comparison_method = '==')
+      unless [:'==', :'>', :'>=', :'<', :'<=', :match].include?(comparison_method.to_sym)
+        raise Exceptions::InvalidWhereQuery
+      end
+      self.class.new(
+        @list.collect {|item| item if item.send(attribute).send(comparison_method.to_sym, value) }.compact,
+        @type
+      )
+    end
   end
 end
