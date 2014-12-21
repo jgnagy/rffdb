@@ -21,7 +21,7 @@ module RubyFFDB
 
     # Store data
     # @param type [Document] type of {Document} to store
-    # @param object_id [Object] unique identifier for the data to store (usually an {Integer})
+    # @param object_id [Object] unique identifier for the data to store (usually an Integer)
     # @param data [Object] data to be stored
     def self.store(type, object_id, data)
       false
@@ -29,7 +29,7 @@ module RubyFFDB
 
     # Retrieve some stored data
     # @param type [Document] type of {Document} to retrieve
-    # @param object_id [Object] unique identifier for the stored data (usually an {Integer})
+    # @param object_id [Object] unique identifier for the stored data (usually an Integer)
     # @param use_caching [Boolean] attempt to pull the data from cache (or not)
     def self.retrieve(type, object_id, use_caching = true)
       false
@@ -42,7 +42,7 @@ module RubyFFDB
 
     # The full path to a stored (or would-be stored) {Document}
     # @param type [Document] the document type
-    # @param object_id [Object] unique identifier for the document (usually an {Integer})
+    # @param object_id [Object] unique identifier for the document (usually an Integer)
     def self.file_path(type, object_id)
       false
     end
@@ -93,7 +93,7 @@ module RubyFFDB
 
     # Attempt to retrieve an item from the {Document} type's cache instance
     # @param type [Document] the document type
-    # @param object_id [Object] unique identifier for the document (usually an {Integer})
+    # @param object_id [Object] unique identifier for the document (usually an Integer)
     def self.cache_lookup(type, object_id)
       @caches ||= {}
       @caches[type] ||= CacheProviders::LRUCache.new
@@ -102,7 +102,7 @@ module RubyFFDB
 
     # Store some data in the cache for the {Document} type
     # @param type [Document] the document type
-    # @param object_id [Object] unique identifier for the document (usually an {Integer})
+    # @param object_id [Object] unique identifier for the document (usually an Integer)
     # @param data [Object] data to be stored
     # @return [Boolean]
     def self.cache_store(type, object_id, data)
