@@ -47,10 +47,23 @@ module RubyFFDB
       end
     end
 
+    # Set the cache provider to use for a document type
+    # This completes flushes all cache.
+    def self.cache_provider(document_type, cache_provider_class)
+      unless cache_provider_class.instance_of? Class and cache_provider_class.ancestors.include?(CacheProvider)
+        raise Exceptions::InvalidCacheProvider
+      end
+      @caches ||= {}
+      @caches[document_type] = cache_provider_class.new
+    end
+
     def self.cache_size(type, size)
       @caches ||= {}
-      @caches[type] ||= CacheProviders::LRUCache.new(size)
-      @caches[type] = LRUCache.new(size) unless @caches[type].size == size
+      if @caches.has_key?(type)
+        @caches[type] = @caches[type].class.new(size)
+      else
+        @caches[type] = CacheProviders::LRUCache.new(size)
+      end
     end
 
     def self.cache_lookup(type, object_id)

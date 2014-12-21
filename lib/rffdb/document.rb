@@ -108,9 +108,20 @@ module RubyFFDB
 
     # Set the StorageEngine class for this Document type
     # @raise [Exceptions::InvalidEngine] if the specified {StorageEngine} does not exist
-    def self.engine(storage_engine)
+    # @raise [Exceptions::InvalidCacheProvider] if a cache_provider is specified and it isn't a type of {CacheProvider}
+    def self.engine(storage_engine, cache_opts = {})
       raise Exceptions::InvalidEngine unless storage_engine.instance_of? Class and storage_engine.ancestors.include?(StorageEngine)
       @engine = storage_engine
+      if cache_opts.has_key?(:cache_provider)
+        # Make sure the cache provider specified is valid
+        unless cache_opts[:cache_provider].instance_of? Class and cache_opts[:cache_provider].ancestors.include?(CacheProvider)
+          raise Exceptions::InvalidCacheProvider
+        end
+        @engine.cache_provider(self, cache_opts[:cache_provider])
+      end
+      if cache_opts.has_key?(:cache_size)
+        @engine.cache_size(self, cache_opts[:cache_size])
+      end
     end
 
     # @return [StorageEngine] a reference to the storage engine singleton of this document class
