@@ -89,7 +89,7 @@ module RubyFFDB
 
     self.singleton_class.send(:alias_method, :get, :load)
 
-    # This method is used to define the schema for a document. It sets up all data access for the class,
+    # This DSL method is used to define the schema for a document. It sets up all data access for the class,
     # and allows specifying strict checks on that schema during its use, such as validations, class types, regexp
     # formatting, etc.
     #
@@ -106,7 +106,12 @@ module RubyFFDB
       @structure[name.to_sym][:validations] = options.has_key?(:validate) ? [*options[:validate]] : []
     end
 
-    # Set the StorageEngine class for this Document type
+    # This DSL method is used to setup the backend {StorageEngine} class and optionally the {CacheProvider}
+    # for this Document type.
+    #
+    # @param storage_engine [Class] the {StorageEngine} child class to use
+    # @option cache_opts [Class] :cache_provider (CacheProviders::LRUCache) the {CacheProvider} child class for caching
+    # @option cache_opts [Fixnum] :cache_size the cache size, in terms of the number of objects stored
     # @raise [Exceptions::InvalidEngine] if the specified {StorageEngine} does not exist
     # @raise [Exceptions::InvalidCacheProvider] if a cache_provider is specified and it isn't a type of {CacheProvider}
     def self.engine(storage_engine, cache_opts = {})

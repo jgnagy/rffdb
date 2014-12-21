@@ -133,7 +133,7 @@ module RubyFFDB
       def retrieve(key)
         if has?(key)
           @meta_mutex.synchronize { @hits += 1 }
-          # TODO refactor to not require a write on read
+          # Looks dumb, as it stores the value again, but it actually only reorganizes the keys Array
           store(key, @read_mutex.synchronize { @data[key] })
         else
           @meta_mutex.synchronize { @misses += 1 }
