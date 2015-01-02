@@ -127,7 +127,6 @@ To Do
 
 * YARD documentation on everything
 * Thread-safety
-  * Add mutex / locking at the model level (like table-level locking) for writing to disk
   * Add mutex / locking at the model level for writing to cache
 * Thread-pool for non-blocking / asynchronous writing to disk (must be optional and default to disabled)
 * Indexing of columns, defined at model

@@ -159,7 +159,7 @@ module RubyFFDB
     end
 
     # Allow direct access to the cache instance of this document class
-    # @return [LRUCache] this class' cache instance
+    # @return [CacheProvider] this class' cache instance
     def self.cache
       storage.cache(self)
     end
