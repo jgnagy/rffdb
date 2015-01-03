@@ -85,7 +85,7 @@ If you want to make another model that uses a different storage engine, just spe
 
     #!ruby
     class Customer < RubyFFDB::Document
-      engine RubyFFDB::StorageEngines::MyAwesomeEngine  # default is RubyFFDB::StorageEngines::YamlEngine
+      engine RubyFFDB::StorageEngines::JsonEngine  # default is RubyFFDB::StorageEngines::YamlEngine
       
       attribute :address,       :class => String
       attribute :first_name,    :class => String
@@ -102,18 +102,40 @@ Whoa, see what just happened? We used a different storage engine, and we validat
 
     #!ruby
     class Payment < RubyFFDB::Document
-      attribute :method,  :class => String, :validate => :valid_payment_methods
-      attribute :amount, :class => Float
+      # The "engine" DSL method also providers a means to customize caching for this model
+      engine RubyFFDB::StorageEngines::JsonEngine,
+        :cache_provider => RubyFFDB::CacheProviders::RRCache,
+        :cache_size     => 200
+      attribute :cc_vendor,  :class => String, :validate => :valid_payment_methods
+      attribute :amount,     :class => Float
       
-      def valid_payment_methods(method)
-        ['visa', 'master card'].include? method
+      def valid_payment_methods(payment_method)
+        ['visa', 'master card'].include? payment_method
       end
     end
     
     payment = Payment.new
     payment.amount = 22.17
-    payment.method = "amex"
+    payment.cc_vendor = "amex"
     #  RubyFFDB::Exceptions::FailedValidation raised
+
+Instances of `Document` (or its collection class, `DocumentCollection`) support querying via attributes:
+
+    #!ruby
+    # All payments... ever
+    payments = Payments.all
+    
+    # Just payments made with Visa
+    visa_payments = Payments.where(:cc_vendor, 'visa')
+    
+    # Just visa payments of more than $100
+    #   Notice we can just query an existing collection
+    #   Also note the clunky syntax. You specify "attribute", then "value", then the comparison operator, if it isn't "=="
+    big_visa_payments = visa_payments.where(:amount, 100.00, '>')
+    
+    # Just master card payments of less than $10
+    #   Notice that AND queries are just chaining WHERE queries
+    little_mc_payments = Payments.where(:amount, 10.00, '<').where(:cc_vendor, 'master card')
 
 The possibilities are endless, but this is it for now.
 
