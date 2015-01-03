@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
     "lib/rffdb/exceptions/document_exceptions.rb",
     "lib/rffdb/cache_provider.rb",
     "lib/rffdb/cache_providers/lru_cache.rb",
+    "lib/rffdb/cache_providers/rr_cache.rb",
     "lib/rffdb/storage_engine.rb",
     "lib/rffdb/storage_engines/yaml_engine.rb",
     "lib/rffdb/storage_engines/json_engine.rb",
