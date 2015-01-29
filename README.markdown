@@ -102,7 +102,7 @@ Whoa, see what just happened? We used a different storage engine, and we validat
 
     #!ruby
     class Payment < RubyFFDB::Document
-      # The "engine" DSL method also providers a means to customize caching for this model
+      # The "engine" DSL method also provides a means to customize caching
       engine RubyFFDB::StorageEngines::JsonEngine,
         :cache_provider => RubyFFDB::CacheProviders::RRCache,
         :cache_size     => 200
@@ -130,7 +130,8 @@ Instances of `Document` (or its collection class, `DocumentCollection`) support 
     
     # Just visa payments of more than $100
     #   Notice we can just query an existing collection
-    #   Also note the clunky syntax. You specify "attribute", then "value", then the comparison operator, if it isn't "=="
+    #   Also note the clunky syntax. You specify "attribute", then "value", then the comparison method.
+    #   Valid comparison methods include: '>', '>=', '<', '<=', '==', or the special 'match' method.
     big_visa_payments = visa_payments.where(:amount, 100.00, '>')
     
     # Just master card payments of less than $10
@@ -149,13 +150,14 @@ To Do
 
 * YARD documentation on everything
 * Thread-safety
-  * Add mutex / locking at the model level for writing to cache
 * Thread-pool for non-blocking / asynchronous writing to disk (must be optional and default to disabled)
 * Indexing of columns, defined at model
 * Full-text searchable fields, configured on model
 * Write a method for clearing cache (globally and at the Model level) and invalidating individual instances (at the instance level)
 * Add a way of disabling lazy-loading of data from disk at the model level
-  * Maybe make this a generic "engine options" DSL method
+* Add "order_by" and a method for pagination of results (like LIMIT)
+* Additional cache providers (at least SLRU and LFU)
+* More Storage Engines (perhaps XML)
 
 Contributing
 ------------
