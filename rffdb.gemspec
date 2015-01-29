@@ -9,6 +9,8 @@ Gem::Specification.new do |s|
   s.description = "A demonstration gem"
   s.authors     = ["Jonathan Gnagy"]
   s.email       = 'jonathan.gnagy@gmail.com'
+  s.homepage    = 'https://rubygems.org/gems/rffdb'
+  s.required_ruby_version = '~> 2.0'
   s.files       = [
     "lib/rffdb.rb",
     "lib/rffdb/exception.rb",
