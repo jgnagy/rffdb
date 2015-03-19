@@ -12,7 +12,7 @@ Some interesting concepts have been introduced (mostly to experiment), such as l
 Building
 -----
 
-The eventual goal is for this gem to simply be available via a normal rubygems search, but until then, you must build and install the gem yourself. This can be done like so:
+While it is recommended to simply install via a normal rubygems search via ` gem install rffdb` (or adding `gem "rffdb"` to your Gemfile), you can build and install the gem yourself. This can be done like so:
 
     #!bash
     # need Mercurial to clone the repo... or download it from https://bitbucket.org/jgnagy/rffdb/get/tip.zip

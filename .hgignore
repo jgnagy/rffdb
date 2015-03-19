@@ -8,3 +8,7 @@ tmp/
 
 # Ignore built gem files
 *.gem
+
+# Ignore doc files
+doc/
+.yardoc
