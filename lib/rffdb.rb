@@ -1,5 +1,6 @@
 require 'ostruct'
 require 'rffdb/version'
+require 'rffdb/constants'
 require 'rffdb/exception'
 require 'rffdb/exceptions/cache_exceptions'
 require 'rffdb/exceptions/document_exceptions'

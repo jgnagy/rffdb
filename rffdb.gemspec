@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '~> 2.0'
   s.files       = [
     "lib/rffdb.rb",
+    "lib/rffdb/constants.rb",
     "lib/rffdb/exception.rb",
     "lib/rffdb/exceptions/cache_exceptions.rb",
     "lib/rffdb/exceptions/document_exceptions.rb",
@@ -25,6 +26,7 @@ Gem::Specification.new do |s|
     "lib/rffdb/document.rb",
     "lib/rffdb/document_collection.rb",
     "lib/rffdb/version.rb",
+    "README.markdown",
     "LICENSE"
   ]
   s.license     = 'MIT'

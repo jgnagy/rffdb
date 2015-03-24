@@ -43,7 +43,7 @@ module RubyFFDB
       end
 
       def self.file_path(type, object_id)
-        File.join(type.to_s.gsub('::', "__"), 'documents', object_id.to_s + ".yml")
+        File.join(DB_DATA, type.to_s.gsub('::', "__"), 'documents', object_id.to_s + ".yml")
       end
     end
   end
