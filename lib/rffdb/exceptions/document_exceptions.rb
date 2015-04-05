@@ -19,4 +19,3 @@ module RubyFFDB
     end
   end
 end
-    

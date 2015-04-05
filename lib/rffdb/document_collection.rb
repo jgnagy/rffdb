@@ -16,7 +16,7 @@ module RubyFFDB
     def each(&block)
       @list.each(&block)
     end
-    
+
     # Returns the number of Document instances in the collection
     # @return [Fixnum]
     def size
@@ -38,7 +38,7 @@ module RubyFFDB
     # Return the collection item at the specified index
     # @return [Document,DocumentCollection] the item at the requested index
     def [](index)
-      if index.kind_of?(Range)
+      if index.is_a?(Range)
         self.class.new(@list[index], @type)
       else
         @list[index]
@@ -56,15 +56,19 @@ module RubyFFDB
     #
     # @param attribute [Symbol] the attribute to query
     # @param value [Object] the value to compare against
-    # @param comparison_method [String,Symbol] the method to use for comparison - allowed options are "'==', '>', '>=', '<', '<=', and 'match'"
+    # @param comparison_method [String,Symbol] the method to use for comparison
+    #   - allowed options are "'==', '>', '>=', '<', '<=', and 'match'"
     # @raise [Exceptions::InvalidWhereQuery] if not the right kind of comparison
     # @return [DocumentCollection]
     def where(attribute, value, comparison_method = '==')
-      unless [:'==', :'>', :'>=', :'<', :'<=', :match].include?(comparison_method.to_sym)
-        raise Exceptions::InvalidWhereQuery
+      valid_comparison_methods = [:'==', :'>', :'>=', :'<', :'<=', :match]
+      unless valid_comparison_methods.include?(comparison_method.to_sym)
+        fail Exceptions::InvalidWhereQuery
       end
       self.class.new(
-        @list.collect {|item| item if item.send(attribute).send(comparison_method.to_sym, value) }.compact,
+        @list.collect { |item|
+          item if item.send(attribute).send(comparison_method.to_sym, value)
+        }.compact,
         @type
       )
     end

@@ -1,16 +1,17 @@
 module RubyFFDB
   module CacheProviders
-    # A very simple Least Recently Used (LRU) cache implementation. Stores data in a Hash,
-    # uses a dedicated Array for storing and sorting keys (and implementing the LRU algorithm),
-    # and doesn't bother storing access information for cache data. It stores hit and miss counts
-    # for the entire cache (not for individual keys). It also uses three mutexes for thread-safety:
-    # a write lock, a read lock, and a metadata lock.
+    # A very simple Least Recently Used (LRU) cache implementation. Stores data
+    # in a Hash, uses a dedicated Array for storing and sorting keys (and
+    # implementing the LRU algorithm), and doesn't bother storing access
+    # information for cache data. It stores hit and miss counts for the
+    # entire cache (not for individual keys). It also uses three mutexes for
+    # thread-safety: a write lock, a read lock, and a metadata lock.
     class LRUCache < CacheProvider
       attr_reader :max_size, :keys
 
       # @raise [Exceptions::InvalidCacheSize] if the max_size isn't an Integer
       def initialize(max_size = 100)
-        raise Exceptions::InvalidCacheSize unless max_size.kind_of?(Integer)
+        fail Exceptions::InvalidCacheSize unless max_size.is_a?(Integer)
 
         @max_size     = max_size
         @hits         = 0
@@ -55,7 +56,8 @@ module RubyFFDB
         to_hash.each(&block)
       end
 
-      # Invalidate a cached item by its index / key. Returns `nil` if the object doesn't exist.
+      # Invalidate a cached item by its index / key. Returns `nil` if the object
+      # doesn't exist.
       # @param key [Symbol] the cached object's index
       def invalidate(key)
         invalidate_key(key)
@@ -76,7 +78,8 @@ module RubyFFDB
         end
       end
 
-      # Similar to {#truncate} (in fact, it calls it) but it also clears the statistical metadata.
+      # Similar to {#truncate} (in fact, it calls it) but it also clears the
+      # statistical metadata.
       # @return [Boolean] was the flush operation successful?
       def flush
         if truncate
@@ -87,19 +90,26 @@ module RubyFFDB
         end
       end
 
-      # Provides a hash of the current metadata for the cache. It provides the current cache size (`:size`),
-      # the number of cache hits (`:hits`), and the number of cache misses (`:misses`).
+      # Provides a hash of the current metadata for the cache. It provides the
+      # current cache size (`:size`),the number of cache hits (`:hits`), and
+      # the number of cache misses (`:misses`).
       # @return [Hash] cache statistics
       def statistics
-        {size: size, hits: @meta_mutex.synchronize { @hits }, misses: @meta_mutex.synchronize { @misses }}
+        {
+          size: size,
+          hits: @meta_mutex.synchronize { @hits },
+          misses: @meta_mutex.synchronize { @misses }
+        }
       end
 
-      # Store some data (`value`) indexed by a `key`. If an object exists with the same key, and the
-      # value is different, it will be overwritten. Storing a value causes its key to be moved to the end
-      # of the keys array (meaning it is the __most recently used__ item), and this happens on #store regardless
-      # of whether or not the key previously existed. This behavior is relied upon by {#retrieve} to allow
-      # reorganization of the keys without necessarily modifying the data it indexes. Uses recursion for overwriting
-      # existing items.
+      # Store some data (`value`) indexed by a `key`. If an object exists with
+      # the same key, and the value is different, it will be overwritten.
+      # Storing a value causes its key to be moved to the end of the keys array
+      # (meaning it is the __most recently used__ item), and this happens on
+      # #store regardless of whether or not the key previously existed.
+      # This behavior is relied upon by {#retrieve} to allow reorganization of
+      # the keys without necessarily modifying the data it indexes.
+      # Uses recursion for overwriting existing items.
       #
       # @param key [Symbol] the index to use for referencing this cached item
       # @param value [Object] the data to cache
@@ -114,9 +124,7 @@ module RubyFFDB
             store(key, value)
           end
         else
-          if size >= @max_size
-            invalidate(@keys.first) until size < @max_size
-          end
+          invalidate(@keys.first) until size < @max_size if size >= @max_size
 
           @write_mutex.synchronize do
             @meta_mutex.synchronize { @keys << key }
@@ -127,13 +135,14 @@ module RubyFFDB
 
       alias_method :[]=, :store
 
-      # Retrieve an item from the cache. Returns `nil` if the item doesn't exist. Relies on {#store} returning the
-      # stored value to ensure the LRU algorithm is maintained safely.
+      # Retrieve an item from the cache. Returns `nil` if the item does not
+      # exist. Relies on {#store} returning the stored value to ensure the LRU
+      # algorithm is maintained safely.
       # @param key [Symbol] the index to retrieve
       def retrieve(key)
         if has?(key)
           @meta_mutex.synchronize { @hits += 1 }
-          # Looks dumb, as it stores the value again, but it actually only reorganizes the keys Array
+          # Looks dumb, but it actually only reorganizes the keys Array
           store(key, @read_mutex.synchronize { @data[key] })
         else
           @meta_mutex.synchronize { @misses += 1 }

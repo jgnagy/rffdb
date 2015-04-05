@@ -1,0 +1,18 @@
+AllCops:
+  Exclude:
+    - vendor/**
+
+MethodLength:
+  Max: 30
+
+ClassLength:
+  Enabled: false
+
+AbcSize:
+  Max: 20
+
+CyclomaticComplexity:
+  Max: 10
+
+PerceivedComplexity:
+  Max: 10
