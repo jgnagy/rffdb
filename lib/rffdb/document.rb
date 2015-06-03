@@ -1,5 +1,6 @@
 module RubyFFDB
   class Document
+    include Comparable
     attr_reader :id
 
     # @raise [Exceptions::NoSuchDocument] retrieved a non-existing document
@@ -196,6 +197,11 @@ module RubyFFDB
     # @see DocumentCollection#where
     def self.where(attribute, value, comparison_method = '==')
       all.where(attribute, value, comparison_method)
+    end
+
+    # Compare two documents
+    def <=>(other_doc)
+      self.id <=> other_doc.id
     end
 
     # Uses the defined schema to setup getter and setter methods. Runs

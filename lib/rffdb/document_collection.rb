@@ -1,6 +1,7 @@
 module RubyFFDB
   class DocumentCollection
     include Enumerable
+    include Comparable
 
     # @return [Class] this is a collection of this {Document} subclass
     attr_reader :type
@@ -43,6 +44,22 @@ module RubyFFDB
       else
         @list[index]
       end
+    end
+
+    # Allow comparison of collection
+    # @return [Boolean] are the collections identical?
+    def ==(collection)
+      if collection.is_a? self.class
+        self.collect {|d| d.id }.sort == collection.collect {|d| d.id }.sort
+      else
+        false
+      end
+    end
+
+    # Does the collection contain anything?
+    # @return [Boolean]
+    def empty?
+      @list.empty?
     end
 
     # Allow complex sorting like an Array
