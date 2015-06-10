@@ -102,6 +102,7 @@ module RubyFFDB
     # @option options [Array, Symbol] :validate either a symbol or array of
     #   symbols referencing the instance method(s) to use to validate this
     #   attribute
+    # @option options [Boolean] :unique should this attribute be unique?
     def self.attribute(name, options = {})
       @structure ||= {}
       @structure[name.to_sym] = {}
@@ -112,6 +113,8 @@ module RubyFFDB
         options.key?(:format) ? options[:format] : nil
       @structure[name.to_sym][:validations] =
         options.key?(:validate) ? [*options[:validate]] : []
+      @structure[name.to_sym][:unique] =
+        options.key?(:unique) == true ? true : false
     end
 
     # This DSL method is used to setup the backend {StorageEngine} class and
@@ -200,8 +203,8 @@ module RubyFFDB
     end
 
     # Compare two documents
-    def <=>(other_doc)
-      self.id <=> other_doc.id
+    def <=>(other)
+      id <=> other.id
     end
 
     # Uses the defined schema to setup getter and setter methods. Runs
@@ -222,6 +225,9 @@ module RubyFFDB
              args.last.to_s.match(structure[key][:format])
            )
           valid = true
+          if structure[key][:unique] == true
+            fail Exceptions::NotUnique unless test_uniqueness(key, args.last)
+          end
           structure[key][:validations].each do |validation|
             valid = send(validation.to_sym, args.last)
             fail Exceptions::FailedValidation unless valid
@@ -257,6 +263,23 @@ module RubyFFDB
         true
       else
         super
+      end
+    end
+
+    private
+
+    # check if a value is unique
+    # @return [Boolean] is the value for this column unique?
+    def test_uniqueness(column, value)
+      if committed?
+        (self.class.where(column.to_sym, value) - self).empty?
+      else
+        list = self.class.where(column.to_sym, value)
+        if list.size == 1
+          list.first.id == id
+        else
+          true
+        end
       end
     end
   end

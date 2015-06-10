@@ -15,6 +15,9 @@ module RubyFFDB
     class NoSuchDocument < Exception
     end
 
+    class NotUnique < Exception
+    end
+
     class PendingChanges < Exception
     end
   end

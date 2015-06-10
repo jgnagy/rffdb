@@ -46,11 +46,60 @@ module RubyFFDB
       end
     end
 
+    # Return a collection after subtracting from the original
+    # @return [DocumentCollection]
+    def -(other)
+      new_list = @list.dup
+      if other.respond_to?(:to_a)
+        other.to_a.each do |item|
+          new_list.delete_if { |document| document.id == item.id }
+        end
+      elsif other.is_a?(@type)
+        new_list.delete_if { |document| document.id == other.id }
+      else
+        fail Exceptions::InvalidInput
+      end
+      self.class.new(new_list, @type)
+    end
+
+    # Return a collection after adding to the original
+    #   Warning: this may cause duplicates or mixed type joins! For safety,
+    #   use #merge
+    # @return [DocumentCollection]
+    def +(other)
+      if other.respond_to?(:to_a)
+        self.class.new(@list + other.to_a, @type)
+      elsif other.is_a?(@type)
+        self.class.new(@list + [other], @type)
+      else
+        fail Exceptions::InvalidInput
+      end
+    end
+
+    # Merge two collections
+    # @return [DocumentCollection]
+    def merge(other)
+      if other.is_a?(self.class) && other.type == @type
+        new_list = []
+
+        new_keys = collect(&:id)
+        new_keys += other.collect(&:id)
+
+        new_keys.sort.uniq.each do |doc_id|
+          new_list << self.class.get(doc_id)
+        end
+
+        self.class.new(new_list, @type)
+      else
+        fail Exceptions::InvalidInput
+      end
+    end
+
     # Allow comparison of collection
-    # @return [Boolean] are the collections identical?
-    def ==(collection)
-      if collection.is_a? self.class
-        self.collect {|d| d.id }.sort == collection.collect {|d| d.id }.sort
+    # @return [Boolean] do the collections contain the same document ids?
+    def ==(other)
+      if other.is_a? self.class
+        collect(&:id).sort == other.collect(&:id).sort
       else
         false
       end
@@ -83,9 +132,9 @@ module RubyFFDB
         fail Exceptions::InvalidWhereQuery
       end
       self.class.new(
-        @list.collect { |item|
+        @list.collect do |item|
           item if item.send(attribute).send(comparison_method.to_sym, value)
-        }.compact,
+        end.compact,
         @type
       )
     end
