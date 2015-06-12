@@ -139,5 +139,31 @@ module RubyFFDB
       @indexes[type] ||= {}
       @indexes[type][column.to_sym] ||= Index.new(type, column.to_sym)
     end
+
+    # Update the index for a column
+    # @param type [Document] the document type
+    # @param column [String,Symbol] the column / attribute for the index
+    # @param object_id [Object] unique identifier for the document
+    # @param data [String] column data to be stored
+    def self.index_update(type, column, object_id, data)
+      i = index(type, column)
+      # Delete all previous entries in this index
+      oldkeys = i.keys.collect { |k| k if i.get(k).include?(object_id) }.compact
+      oldkeys.each do |k|
+        i.delete(k, object_id)
+      end
+
+      # Add the new indexed version
+      i.put(data, object_id)
+    end
+
+    # Query an index for column data
+    # @param type [Document] the document type
+    # @param column [String,Symbol] the column / attribute for the index
+    # @param data [String] column data to use for the lookup
+    def self.index_lookup(type, column, data)
+      i = index(type, column)
+      i.get(data)
+    end
   end
 end

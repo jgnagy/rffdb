@@ -11,6 +11,9 @@ module RubyFFDB
           File.open(path, 'w') do |file|
             file.puts YAML.dump(data)
           end
+          type.structure.collect {|k,v| k if v[:index] }.compact.each do |col|
+            index_update(type, col, object_id, data[col.to_s])
+          end
           cache_store(type, object_id, data)
         end
         true

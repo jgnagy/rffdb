@@ -205,7 +205,7 @@ module RubyFFDB
     def self.where(attribute, value, comparison_method = '==')
       if comparison_method.to_s == '==' && indexed_column?(attribute)
         DocumentCollection.new(
-          storage.index(self, attribute).get(value).collect { |did| load(did) },
+          storage.index_lookup(self, attribute, value).collect { |did| load(did) },
           self
         )
       else
@@ -260,9 +260,7 @@ module RubyFFDB
           @read_lock.synchronize do
             @write_lock.synchronize do
               if valid
-                storage.index(self.class, key).delete(@data[key.to_s], id) if indexed_column?(key)
                 @data[key.to_s] = args.last
-                storage.index(self.class, key).put(args.last, id) if indexed_column?(key)
               end
             end
           end
