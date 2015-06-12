@@ -133,7 +133,11 @@ module RubyFFDB
       end
       self.class.new(
         @list.collect do |item|
-          item if item.send(attribute).send(comparison_method.to_sym, value)
+          if item.send(attribute).nil?
+            nil
+          else
+            item if item.send(attribute).send(comparison_method.to_sym, value)
+          end
         end.compact,
         @type
       )

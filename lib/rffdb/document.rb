@@ -202,14 +202,16 @@ module RubyFFDB
 
     # Query for Documents based on an attribute
     # @see DocumentCollection#where
-    def self.where(attribute, value, comparison_method = '==')
-      if comparison_method.to_s == '==' && indexed_column?(attribute)
+    def self.where(attribute, value, comp_op = '==')
+      if indexed_column?(attribute)
         DocumentCollection.new(
-          storage.index_lookup(self, attribute, value).collect { |did| load(did) },
+          storage.index_lookup(self, attribute, value, comp_op).collect do |did|
+            load(did)
+          end,
           self
         )
       else
-        all.where(attribute, value, comparison_method)
+        all.where(attribute, value, comp_op)
       end
     end
 

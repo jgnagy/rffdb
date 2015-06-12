@@ -54,10 +54,23 @@ module RubyFFDB
       end
     end
 
+    # Complex queries of the index can be done with this method
+    # @return [Array] An array of object ids matching the query
+    def query(q, operator = '==')
+      datum = []
+      GDBM.open(file_path, 0664, GDBM::READER) do |index|
+        index.each_pair do |key, value|
+          datum += Marshal.load(value) if key.send(operator.to_sym, q)
+        end
+      end
+      datum.uniq.compact
+    end
+
     # Evict keys (column data) with no associated Documents
     def prune
       GDBM.open(file_path, 0664, GDBM::WRCREAT) do |index|
         index.delete_if { |key, value| Marshal.load(value).empty? }
+        index.reorganize # clear up wasted disk space
       end
     end
   end

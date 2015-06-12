@@ -161,9 +161,9 @@ module RubyFFDB
     # @param type [Document] the document type
     # @param column [String,Symbol] the column / attribute for the index
     # @param data [String] column data to use for the lookup
-    def self.index_lookup(type, column, data)
+    def self.index_lookup(type, column, data, operator = '==')
       i = index(type, column)
-      i.get(data)
+      i.query(data, operator)
     end
   end
 end

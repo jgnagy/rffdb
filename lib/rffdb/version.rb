@@ -1,3 +1,3 @@
 module RubyFFDB
-  VERSION = [0, 1, 1].join('.')
+  VERSION = [0, 1, 2].join('.')
 end
