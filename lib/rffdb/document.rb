@@ -36,7 +36,9 @@ module RubyFFDB
     def commit
       @read_lock.synchronize do
         @write_lock.synchronize do
-          storage.store(self.class, @id, @data.dup) unless @saved
+          unless @saved
+            storage.store(self.class, @id, @data.dup)
+          end
           @saved = true
         end
       end
@@ -115,6 +117,8 @@ module RubyFFDB
         options.key?(:validate) ? [*options[:validate]] : []
       @structure[name.to_sym][:unique] =
         options.key?(:unique) == true ? true : false
+      @structure[name.to_sym][:index] =
+        options.key?(:index) == true ? true : false
     end
 
     # This DSL method is used to setup the backend {StorageEngine} class and
@@ -199,12 +203,30 @@ module RubyFFDB
     # Query for Documents based on an attribute
     # @see DocumentCollection#where
     def self.where(attribute, value, comparison_method = '==')
-      all.where(attribute, value, comparison_method)
+      if comparison_method.to_s == '==' && indexed_column?(attribute)
+        DocumentCollection.new(
+          storage.index(self, attribute).get(value).collect { |did| load(did) },
+          self
+        )
+      else
+        all.where(attribute, value, comparison_method)
+      end
     end
 
     # Compare two documents
     def <=>(other)
       id <=> other.id
+    end
+
+    # Should this column be indexed?
+    # @return [Boolean]
+    def self.indexed_column?(column)
+      csym = column.to_sym
+      structure.key?(csym) && structure[csym][:index] == true
+    end
+
+    def indexed_column?(column)
+      self.class.send('indexed_column?'.to_sym, column)
     end
 
     # Uses the defined schema to setup getter and setter methods. Runs
@@ -237,9 +259,14 @@ module RubyFFDB
                      @read_lock.synchronize { committed? }
           @read_lock.synchronize do
             @write_lock.synchronize do
-              @data[key.to_s] = args.last if valid
+              if valid
+                storage.index(self.class, key).delete(@data[key.to_s], id) if indexed_column?(key)
+                @data[key.to_s] = args.last
+                storage.index(self.class, key).put(args.last, id) if indexed_column?(key)
+              end
             end
           end
+          commit if indexed_column?(key) # indexed columns always cause commits
         else
           fail Exceptions::InvalidInput
         end
@@ -282,5 +309,6 @@ module RubyFFDB
         end
       end
     end
+
   end
 end

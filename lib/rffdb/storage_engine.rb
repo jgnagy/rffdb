@@ -130,5 +130,14 @@ module RubyFFDB
       @caches ||= {}
       @caches[type] ||= CacheProviders::LRUCache.new
     end
+
+    # Allows direct access to an index for a Document type and column
+    # @param type [Document] the document type
+    # @param column [String,Symbol] the column / attribute for the index
+    def self.index(type, column)
+      @indexes ||= {}
+      @indexes[type] ||= {}
+      @indexes[type][column.to_sym] ||= Index.new(type, column.to_sym)
+    end
   end
 end

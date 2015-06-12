@@ -4,7 +4,7 @@ require 'rffdb/version'
 Gem::Specification.new do |s|
   s.name        = 'rffdb'
   s.version     = RubyFFDB::VERSION
-  s.date        = '2014-06-30'
+  s.date        = Time.now.strftime('%Y-%m-%d')
   s.summary     = 'Ruby FlatFile DB'
   s.description = 'A demonstration gem'
   s.authors     = ['Jonathan Gnagy']
@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
     'lib/rffdb/cache_provider.rb',
     'lib/rffdb/cache_providers/lru_cache.rb',
     'lib/rffdb/cache_providers/rr_cache.rb',
+    'lib/rffdb/index.rb',
     'lib/rffdb/storage_engine.rb',
     'lib/rffdb/storage_engines/yaml_engine.rb',
     'lib/rffdb/storage_engines/json_engine.rb',
