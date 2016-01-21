@@ -86,7 +86,7 @@ module RubyFFDB
         new_keys += other.collect(&:id)
 
         new_keys.sort.uniq.each do |doc_id|
-          new_list << self.class.get(doc_id)
+          new_list << @type.get(doc_id)
         end
 
         self.class.new(new_list, @type)
@@ -155,7 +155,7 @@ module RubyFFDB
     # @raise [Exceptions::InvalidWhereQuery] if not the right kind of comparison
     # @return [DocumentCollection]
     def or(attribute, value, comparison_method = '==')
-      merge where(attribute, value, comparison_method)
+      merge @type.where(attribute, value, comparison_method)
     end
   end
 end
