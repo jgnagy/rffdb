@@ -123,11 +123,11 @@ module RubyFFDB
     # @param attribute [Symbol] the attribute to query
     # @param value [Object] the value to compare against
     # @param comparison_method [String,Symbol] the method to use for comparison
-    #   - allowed options are "'==', '>', '>=', '<', '<=', and 'match'"
+    #   - allowed options are "'==', '!=', '>', '>=', '<', '<=', and 'match'"
     # @raise [Exceptions::InvalidWhereQuery] if not the right kind of comparison
     # @return [DocumentCollection]
     def where(attribute, value, comparison_method = '==')
-      valid_comparison_methods = [:'==', :'>', :'>=', :'<', :'<=', :match]
+      valid_comparison_methods = [:'==', :'!=', :'>', :'>=', :'<', :'<=', :match]
       unless valid_comparison_methods.include?(comparison_method.to_sym)
         fail Exceptions::InvalidWhereQuery
       end
@@ -141,6 +141,21 @@ module RubyFFDB
         end.compact,
         @type
       )
+    end
+
+    alias_method :and, :where
+
+    # Hacked together #or() method in the same spirit as #where().
+    # This method can be chained for multiple / more specific queries.
+    #
+    # @param attribute [Symbol] the attribute to query
+    # @param value [Object] the value to compare against
+    # @param comparison_method [String,Symbol] the method to use for comparison
+    #   - allowed options are "'==', '!=', '>', '>=', '<', '<=', and 'match'"
+    # @raise [Exceptions::InvalidWhereQuery] if not the right kind of comparison
+    # @return [DocumentCollection]
+    def or(attribute, value, comparison_method = '==')
+      merge where(attribute, value, comparison_method)
     end
   end
 end
