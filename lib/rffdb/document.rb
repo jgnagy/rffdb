@@ -5,6 +5,8 @@ module RubyFFDB
 
     # @raise [Exceptions::NoSuchDocument] retrieved a non-existing document
     def initialize(existing_id = false, lazy = true)
+      @read_lock  = Mutex.new
+      @write_lock = Mutex.new
       if existing_id
         @id  = existing_id
         fail Exceptions::NoSuchDocument unless File.exist?(file_path)
@@ -21,8 +23,6 @@ module RubyFFDB
         # relative to database root
         @saved = false
       end
-      @read_lock  = Mutex.new
-      @write_lock = Mutex.new
     end
 
     # The location of the flat-file
@@ -69,6 +69,7 @@ module RubyFFDB
       @read_lock.synchronize do
         @write_lock.synchronize { @saved = true }
       end
+      return self
     end
 
     # Overwrites the document's data, either from disk or from cache. Useful for
@@ -82,6 +83,14 @@ module RubyFFDB
       end
     end
 
+    # Allow saving an already saved Document. Useful for reindexing, maybe more.
+    def touch
+      @read_lock.synchronize do
+        @write_lock.synchronize { @saved = false }
+      end
+      return self
+    end
+
     # Currently an alias for #new, but used as a wrapper in case more work needs
     # to be done before pulling a document from the storage engine (such as
     # sanitizing input, etc)
@@ -90,6 +99,14 @@ module RubyFFDB
     end
 
     singleton_class.send(:alias_method, :get, :load)
+
+    # Reindex all documents of this type. This can take a while on large DBs.
+    def self.reindex
+      storage.all(self).each do |doc_id| 
+        new(doc_id, false).touch.commit
+      end
+      return true
+    end
 
     # This DSL method is used to define the schema for a document. It sets up
     # all data access for the class, and allows specifying strict checks
