@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   module CacheProviders
     # A very simple Least Recently Used (LRU) cache implementation. Stores data
     # in a Hash, uses a dedicated Array for storing and sorting keys (and

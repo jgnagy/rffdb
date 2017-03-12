@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   class Index
     def initialize(type, column)
       @type = type

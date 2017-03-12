@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   class Document
     include Comparable
     attr_reader :id

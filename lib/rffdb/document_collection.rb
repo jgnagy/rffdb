@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   class DocumentCollection
     include Enumerable
     include Comparable

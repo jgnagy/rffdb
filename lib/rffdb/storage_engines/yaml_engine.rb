@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   module StorageEngines
     class YamlEngine < StorageEngine
       # TODO: add support for sharding since directories will fill up quickly

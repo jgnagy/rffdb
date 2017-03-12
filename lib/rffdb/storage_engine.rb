@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   # Generic Storage Engine definition. Any subclass *must* implement or inherit
   # the methods defined here (if any).
   class StorageEngine

@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   module Exceptions
     class InvalidCacheSize < Exception
     end

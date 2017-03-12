@@ -1,4 +1,4 @@
-module RubyFFDB
+module RFFDB
   module CacheProviders
     # A simple Random Replacement (RR) cache implementation. Stores data in a
     # Hash, uses a dedicated Array for storing keys (and implementing the RR

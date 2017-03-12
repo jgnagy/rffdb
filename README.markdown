@@ -7,7 +7,7 @@ This is a really horrible idea for anything requiring high performance, but it i
 
 The gem is currently built around the concepts of "documents" and "storage engines". The rffdb gem is built to allow defining and choosing "storage engines" per database model. Database models are subclasses of the `Document` class, and storage engines are subclasses of the `StorageEngine` class.
 
-Some interesting concepts have been introduced (mostly to experiment), such as lazy-loading of model data, a caching layer between model instances and their persistent storage (a simple LRU Cache per model as an instance of `RubyFFDB::CacheProviders::LRUCache`, of course), with more to come. I plan on eventually adding thread-safety through the use of more singletons, with a semaphore or mutex around the persistent storage (with a non-blocking storage pool as an eventual option), indexes and other metadata, full-text search, and maybe someday an embedded web service for serving up the FFDB.
+Some interesting concepts have been introduced (mostly to experiment), such as lazy-loading of model data, a caching layer between model instances and their persistent storage (a simple LRU Cache per model as an instance of `RFFDB::CacheProviders::LRUCache`, of course), with more to come. I plan on eventually adding thread-safety through the use of more singletons, with a semaphore or mutex around the persistent storage (with a non-blocking storage pool as an eventual option), indexes and other metadata, full-text search, and maybe someday an embedded web service for serving up the FFDB.
 
 Building
 -----
@@ -41,7 +41,7 @@ The `YamlEngine` storage engine is included by default. To include additional st
 Now you must define a document model. Let's call this model "Product", like we're making an app to sell things:
 
     #!ruby
-    class Product < RubyFFDB::Document
+    class Product < RFFDB::Document
     end
 
 Now that's a pretty lame document, because all it has is an "id" attribute:
@@ -53,7 +53,7 @@ Now that's a pretty lame document, because all it has is an "id" attribute:
 Let's start over, and this time make it better:
 
     #!ruby
-    class Product < RubyFFDB::Document
+    class Product < RFFDB::Document
       attribute :name,        :class => String
       attribute :price,       :class => Float
       attribute :style,       :class => String
@@ -84,8 +84,8 @@ If you suspect someone else has written to the file, or that it has otherwise ch
 If you want to make another model that uses a different storage engine, just specify the class when you define the model:
 
     #!ruby
-    class Customer < RubyFFDB::Document
-      engine RubyFFDB::StorageEngines::JsonEngine  # default is RubyFFDB::StorageEngines::YamlEngine
+    class Customer < RFFDB::Document
+      engine RFFDB::StorageEngines::JsonEngine  # default is RFFDB::StorageEngines::YamlEngine
       
       attribute :address,       :class => String
       attribute :first_name,    :class => String
@@ -96,15 +96,15 @@ If you want to make another model that uses a different storage engine, just spe
     
     customer = Customer.new
     customer.email = "abcd"
-    #  RubyFFDB::Exceptions::InvalidInput raised
+    #  RFFDB::Exceptions::InvalidInput raised
 
 Whoa, see what just happened? We used a different storage engine, and we validated the format of email addresses! That's right, attributes support specifying a format for Strings using a regular expression. You can also have it execute arbitrary validations (defined in the model class) as long as they're methods that accept a single input: the value you're attempting to set the attribute to:
 
     #!ruby
-    class Payment < RubyFFDB::Document
+    class Payment < RFFDB::Document
       # The "engine" DSL method also provides a means to customize caching
-      engine RubyFFDB::StorageEngines::JsonEngine,
-        :cache_provider => RubyFFDB::CacheProviders::RRCache,
+      engine RFFDB::StorageEngines::JsonEngine,
+        :cache_provider => RFFDB::CacheProviders::RRCache,
         :cache_size     => 200
       attribute :cc_vendor,  :class => String, :validate => :valid_payment_methods
       attribute :amount,     :class => Float
@@ -117,7 +117,7 @@ Whoa, see what just happened? We used a different storage engine, and we validat
     payment = Payment.new
     payment.amount = 22.17
     payment.cc_vendor = "amex"
-    #  RubyFFDB::Exceptions::FailedValidation raised
+    #  RFFDB::Exceptions::FailedValidation raised
 
 Instances of `Document` (or its collection class, `DocumentCollection`) support querying via attributes:
 
@@ -143,7 +143,7 @@ The possibilities are endless, but this is it for now.
 License
 -------
 
-RubyFFDB is distributed under the MIT License
+RFFDB is distributed under the MIT License
 
 To Do
 -----

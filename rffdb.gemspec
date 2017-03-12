@@ -3,7 +3,7 @@ require 'rffdb/version'
 
 Gem::Specification.new do |s|
   s.name        = 'rffdb'
-  s.version     = RubyFFDB::VERSION
+  s.version     = RFFDB::VERSION
   s.date        = Time.now.strftime('%Y-%m-%d')
   s.summary     = 'Ruby FlatFile DB'
   s.description = 'A demonstration gem'
