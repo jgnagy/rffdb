@@ -10,9 +10,9 @@ Gem::Specification.new do |s|
   s.authors     = ['Jonathan Gnagy']
   s.email       = 'jonathan.gnagy@gmail.com'
   s.homepage    = 'https://rubygems.org/gems/rffdb'
-  s.add_development_dependency 'rspec', '~> 3.1'
+
   s.required_ruby_version = '~> 2.0'
-  s.files       = [
+  s.files = [
     'lib/rffdb.rb',
     'lib/rffdb/constants.rb',
     'lib/rffdb/exception.rb',
@@ -31,5 +31,16 @@ Gem::Specification.new do |s|
     'README.markdown',
     'LICENSE'
   ]
-  s.license     = 'MIT'
+  s.license = 'MIT'
+
+  s.metadata['yard.run'] = 'yri'
+  s.platform             = Gem::Platform::RUBY
+
+  s.add_development_dependency 'bundler', '~> 1.12'
+  s.add_development_dependency 'rake', '~> 10.0'
+  s.add_development_dependency 'rspec', '~> 3.1'
+  s.add_development_dependency 'rubocop', '~> 0.35'
+  s.add_development_dependency 'yard',    '~> 0.8'
+  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'travis', '~> 1.8'
 end

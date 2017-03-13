@@ -83,7 +83,7 @@ module RFFDB
     def self.cache_provider(document_type, cache_provider_class)
       unless cache_provider_class.instance_of?(Class) &&
              cache_provider_class.ancestors.include?(CacheProvider)
-        fail Exceptions::InvalidCacheProvider
+        raise Exceptions::InvalidCacheProvider
       end
       @caches ||= {}
       @caches[document_type] = cache_provider_class.new
@@ -94,11 +94,11 @@ module RFFDB
     # @param size [Fixnum] the maximum size of the cache
     def self.cache_size(type, size)
       @caches ||= {}
-      if @caches.key?(type)
-        @caches[type] = @caches[type].class.new(size)
-      else
-        @caches[type] = CacheProviders::LRUCache.new(size)
-      end
+      @caches[type] = if @caches.key?(type)
+                        @caches[type].class.new(size)
+                      else
+                        CacheProviders::LRUCache.new(size)
+                      end
     end
 
     # Attempt to retrieve an item from the {Document} type's cache instance

@@ -5,14 +5,17 @@ AllCops:
 MethodLength:
   Max: 30
 
-ClassLength:
-  Enabled: false
-
-AbcSize:
+Metrics/AbcSize:
   Max: 20
 
-CyclomaticComplexity:
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/CyclomaticComplexity:
   Max: 10
 
-PerceivedComplexity:
-  Max: 10
+Metrics/LineLength:
+  Max: 100
+
+Metrics/MethodLength:
+  Max: 30

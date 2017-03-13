@@ -1,9 +1,9 @@
 module RFFDB
   module Exceptions
-    class InvalidCacheSize < Exception
+    class InvalidCacheSize < RuntimeError
     end
 
-    class InvalidCacheProvider < Exception
+    class InvalidCacheProvider < RuntimeError
     end
   end
 end

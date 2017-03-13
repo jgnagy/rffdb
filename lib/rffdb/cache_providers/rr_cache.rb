@@ -21,9 +21,7 @@ module RFFDB
         if has?(key)
           super(key, value)
         else
-          if size >= @max_size
-            invalidate(@keys.shuffle.first) until size < @max_size
-          end
+          invalidate(@keys.sample) until size < @max_size
 
           @write_mutex.synchronize do
             @meta_mutex.synchronize { @keys << key }
@@ -32,7 +30,7 @@ module RFFDB
         end
       end
 
-      alias_method :[]=, :store
+      alias []= store
     end
   end
 end

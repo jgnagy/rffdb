@@ -11,7 +11,7 @@ module RFFDB
 
       # @raise [Exceptions::InvalidCacheSize] if the max_size isn't an Integer
       def initialize(max_size = 100)
-        fail Exceptions::InvalidCacheSize unless max_size.is_a?(Integer)
+        raise Exceptions::InvalidCacheSize unless max_size.is_a?(Integer)
 
         @max_size     = max_size
         @hits         = 0
@@ -29,8 +29,8 @@ module RFFDB
         @meta_mutex.synchronize { @keys.include?(key) }
       end
 
-      alias_method :has_key?, :has?
-      alias_method :include?, :has?
+      alias has_key? has?
+      alias include? has?
 
       # The number of items in the cache
       # @return [Fixnum] key count
@@ -64,15 +64,15 @@ module RFFDB
         @write_mutex.synchronize { @data.delete(key) }
       end
 
-      alias_method :delete, :invalidate
+      alias delete invalidate
 
       # Remove all items from the cache without clearing statistics
       # @return [Boolean] was the truncate operation successful?
       def truncate
         @read_mutex.synchronize do
           @write_mutex.synchronize do
-            @meta_mutex.synchronize { @keys   = [] }
-            @data   = {}
+            @meta_mutex.synchronize { @keys = [] }
+            @data = {}
           end
           @data.empty?
         end
@@ -83,7 +83,10 @@ module RFFDB
       # @return [Boolean] was the flush operation successful?
       def flush
         if truncate
-          @meta_mutex.synchronize { @hits, @misses = 0, 0 }
+          @meta_mutex.synchronize do
+            @hits = 0
+            @misses = 0
+          end
           true
         else
           false
@@ -124,7 +127,7 @@ module RFFDB
             store(key, value)
           end
         else
-          invalidate(@keys.first) until size < @max_size if size >= @max_size
+          invalidate(@keys.first) until size < @max_size
 
           @write_mutex.synchronize do
             @meta_mutex.synchronize { @keys << key }
@@ -133,7 +136,7 @@ module RFFDB
         end
       end
 
-      alias_method :[]=, :store
+      alias []= store
 
       # Retrieve an item from the cache. Returns `nil` if the item does not
       # exist. Relies on {#store} returning the stored value to ensure the LRU
@@ -150,7 +153,7 @@ module RFFDB
         end
       end
 
-      alias_method :[], :retrieve
+      alias [] retrieve
 
       def marshal_dump
         [@max_size, @hits, @misses, @keys, @data]

@@ -1,5 +1,6 @@
 module RFFDB
   module StorageEngines
+    # The JSON Storage Engine
     class JsonEngine < StorageEngine
       # TODO: add support for sharding since directories will fill up quickly
       require 'json'
@@ -12,7 +13,7 @@ module RFFDB
             file.puts JSON.dump(data)
           end
           # Update all indexed columns
-          type.structure.collect {|k,v| k if v[:index] }.compact.each do |col|
+          type.structure.collect { |k, v| k if v[:index] }.compact.each do |col|
             index_update(type, col, object_id, data[col.to_s])
           end
           cache_store(type, object_id, data)
@@ -27,7 +28,7 @@ module RFFDB
           unless result
             read_lock(type) do
               file = File.open(file_path(type, object_id), 'r')
-              result = JSON.load(file)
+              result = JSON.parse(file)
               file.close
             end
           end
@@ -43,7 +44,7 @@ module RFFDB
         directory_glob = read_lock(type) do
           Dir.glob(File.join(File.dirname(file_path(type, 0)), '*.json'))
         end
-        if directory_glob and !directory_glob.empty?
+        if directory_glob && !directory_glob.empty?
           directory_glob.map { |doc| Integer(File.basename(doc, '.json')) }.sort
         else
           []

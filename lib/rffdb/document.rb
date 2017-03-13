@@ -8,8 +8,8 @@ module RFFDB
       @read_lock  = Mutex.new
       @write_lock = Mutex.new
       if existing_id
-        @id  = existing_id
-        fail Exceptions::NoSuchDocument unless File.exist?(file_path)
+        @id = existing_id
+        raise Exceptions::NoSuchDocument unless File.exist?(file_path)
         if lazy
           @lazy = true
         else
@@ -36,15 +36,13 @@ module RFFDB
     def commit
       @read_lock.synchronize do
         @write_lock.synchronize do
-          unless @saved
-            storage.store(self.class, @id, @data.dup)
-          end
+          storage.store(self.class, @id, @data.dup) unless @saved
           @saved = true
         end
       end
     end
 
-    alias_method :save, :commit
+    alias save commit
 
     # Has this documented been committed to storage?
     # @return [Boolean]
@@ -64,12 +62,12 @@ module RFFDB
           end
         end
       else
-        fail Exceptions::PendingChanges
+        raise Exceptions::PendingChanges
       end
       @read_lock.synchronize do
         @write_lock.synchronize { @saved = true }
       end
-      return self
+      self
     end
 
     # Overwrites the document's data, either from disk or from cache. Useful for
@@ -88,7 +86,7 @@ module RFFDB
       @read_lock.synchronize do
         @write_lock.synchronize { @saved = false }
       end
-      return self
+      self
     end
 
     # Currently an alias for #new, but used as a wrapper in case more work needs
@@ -102,10 +100,10 @@ module RFFDB
 
     # Reindex all documents of this type. This can take a while on large DBs.
     def self.reindex
-      storage.all(self).each do |doc_id| 
+      storage.all(self).each do |doc_id|
         new(doc_id, false).touch.commit
       end
-      return true
+      true
     end
 
     # This DSL method is used to define the schema for a document. It sets up
@@ -153,22 +151,24 @@ module RFFDB
     def self.engine(storage_engine, cache_opts = {})
       unless storage_engine.instance_of?(Class) &&
              storage_engine.ancestors.include?(StorageEngine)
-        fail Exceptions::InvalidEngine
+        raise Exceptions::InvalidEngine
       end
       @engine = storage_engine
       if cache_opts.key?(:cache_provider)
         # Make sure the cache provider specified is valid
         unless cache_opts[:cache_provider].instance_of?(Class) &&
                cache_opts[:cache_provider].ancestors.include?(CacheProvider)
-          fail Exceptions::InvalidCacheProvider
+          raise Exceptions::InvalidCacheProvider
         end
 
         @engine.cache_provider(self, cache_opts[:cache_provider])
       end
 
-      @engine.cache_size(
-        self, cache_opts[:cache_size]
-      ) if cache_opts.key?(:cache_size)
+      if cache_opts.key?(:cache_size)
+        @engine.cache_size(
+          self, cache_opts[:cache_size]
+        )
+      end
     end
 
     # @return [StorageEngine] a reference to the storage engine singleton of
@@ -256,8 +256,8 @@ module RFFDB
     # @raise [Exceptions::InvalidInput] if, while setting, an attribute fails to
     #   conform to the type or format defined in the schema
     def method_missing(method, *args, &block)
-      setter = method.to_s.match(/(.*)=$/) ? true : false
-      key = setter ? $1.to_sym : method.to_s.to_sym
+      setter = method.to_s =~ /(.*)=$/ ? true : false
+      key = setter ? Regexp.last_match(1).to_sym : method.to_s.to_sym
 
       if structure.key?(key) && setter
         if args.last.is_a?(structure[key][:class]) &&
@@ -267,25 +267,23 @@ module RFFDB
            )
           valid = true
           if structure[key][:unique] == true
-            fail Exceptions::NotUnique unless test_uniqueness(key, args.last)
+            raise Exceptions::NotUnique unless test_uniqueness(key, args.last)
           end
           structure[key][:validations].each do |validation|
             valid = send(validation.to_sym, args.last)
-            fail Exceptions::FailedValidation unless valid
+            raise Exceptions::FailedValidation unless valid
           end
           # here is where the lazy-loading happens
           refresh if @read_lock.synchronize { @lazy } &&
                      @read_lock.synchronize { committed? }
           @read_lock.synchronize do
             @write_lock.synchronize do
-              if valid
-                @data[key.to_s] = args.last
-              end
+              @data[key.to_s] = args.last if valid
             end
           end
           commit if indexed_column?(key) # indexed columns always cause commits
         else
-          fail Exceptions::InvalidInput
+          raise Exceptions::InvalidInput
         end
         @saved = false
       elsif structure.key?(key)
@@ -301,7 +299,7 @@ module RFFDB
     end
 
     def respond_to?(method)
-      key = method.to_s.match(/(.*)=$/) ? $1.to_sym : method.to_s.to_sym
+      key = method.to_s =~ /(.*)=$/ ? Regexp.last_match(1).to_sym : method.to_s.to_sym
 
       if structure.key?(key)
         true
@@ -326,6 +324,5 @@ module RFFDB
         end
       end
     end
-
   end
 end

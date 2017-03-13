@@ -1,24 +1,24 @@
 module RFFDB
   module Exceptions
-    class FailedValidation < Exception
+    class FailedValidation < RuntimeError
     end
 
-    class InvalidEngine < Exception
+    class InvalidEngine < RuntimeError
     end
 
-    class InvalidInput < Exception
+    class InvalidInput < RuntimeError
     end
 
-    class InvalidWhereQuery < Exception
+    class InvalidWhereQuery < RuntimeError
     end
 
-    class NoSuchDocument < Exception
+    class NoSuchDocument < RuntimeError
     end
 
-    class NotUnique < Exception
+    class NotUnique < RuntimeError
     end
 
-    class PendingChanges < Exception
+    class PendingChanges < RuntimeError
     end
   end
 end

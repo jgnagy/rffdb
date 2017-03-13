@@ -1,5 +1,6 @@
 module RFFDB
   module StorageEngines
+    # The YAML Storage Engine
     class YamlEngine < StorageEngine
       # TODO: add support for sharding since directories will fill up quickly
       require 'yaml'
@@ -11,7 +12,7 @@ module RFFDB
           File.open(path, 'w') do |file|
             file.puts YAML.dump(data)
           end
-          type.structure.collect {|k,v| k if v[:index] }.compact.each do |col|
+          type.structure.collect { |k, v| k if v[:index] }.compact.each do |col|
             index_update(type, col, object_id, data[col.to_s])
           end
           cache_store(type, object_id, data)

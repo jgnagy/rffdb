@@ -57,7 +57,7 @@ module RFFDB
       elsif other.is_a?(@type)
         new_list.delete_if { |document| document.id == other.id }
       else
-        fail Exceptions::InvalidInput
+        raise Exceptions::InvalidInput
       end
       self.class.new(new_list, @type)
     end
@@ -72,7 +72,7 @@ module RFFDB
       elsif other.is_a?(@type)
         self.class.new(@list + [other], @type)
       else
-        fail Exceptions::InvalidInput
+        raise Exceptions::InvalidInput
       end
     end
 
@@ -91,7 +91,7 @@ module RFFDB
 
         self.class.new(new_list, @type)
       else
-        fail Exceptions::InvalidInput
+        raise Exceptions::InvalidInput
       end
     end
 
@@ -129,7 +129,7 @@ module RFFDB
     def where(attribute, value, comparison_method = '==')
       valid_comparison_methods = [:'==', :'!=', :'>', :'>=', :'<', :'<=', :match]
       unless valid_comparison_methods.include?(comparison_method.to_sym)
-        fail Exceptions::InvalidWhereQuery
+        raise Exceptions::InvalidWhereQuery
       end
       self.class.new(
         @list.collect do |item|
@@ -143,7 +143,7 @@ module RFFDB
       )
     end
 
-    alias_method :and, :where
+    alias and where
 
     # Hacked together #or() method in the same spirit as #where().
     # This method can be chained for multiple / more specific queries.
