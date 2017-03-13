@@ -1,4 +1,5 @@
 module RFFDB
+  # A Simple column-based index for Documents
   class Index
     def initialize(type, column)
       @type = type

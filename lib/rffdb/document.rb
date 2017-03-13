@@ -1,4 +1,5 @@
 module RFFDB
+  # A Database Document (akin to a row in RDBMS)
   class Document
     include Comparable
     attr_reader :id
@@ -55,17 +56,12 @@ module RFFDB
     # @raise [Exceptions::PendingChanges] if attempting to reload with
     #   uncommitted changes (and if `force` is false)
     def reload(force = false)
-      if committed? || force
-        @read_lock.synchronize do
-          @write_lock.synchronize do
-            @data = storage.retrieve(self.class, @id, false)
-          end
-        end
-      else
-        raise Exceptions::PendingChanges
-      end
+      raise Exceptions::PendingChanges unless committed? || force
       @read_lock.synchronize do
-        @write_lock.synchronize { @saved = true }
+        @write_lock.synchronize do
+          @data = storage.retrieve(self.class, @id, false)
+          @saved = true
+        end
       end
       self
     end
@@ -164,11 +160,7 @@ module RFFDB
         @engine.cache_provider(self, cache_opts[:cache_provider])
       end
 
-      if cache_opts.key?(:cache_size)
-        @engine.cache_size(
-          self, cache_opts[:cache_size]
-        )
-      end
+      @engine.cache_size(self, cache_opts[:cache_size]) if cache_opts.key?(:cache_size)
     end
 
     # @return [StorageEngine] a reference to the storage engine singleton of
@@ -274,8 +266,7 @@ module RFFDB
             raise Exceptions::FailedValidation unless valid
           end
           # here is where the lazy-loading happens
-          refresh if @read_lock.synchronize { @lazy } &&
-                     @read_lock.synchronize { committed? }
+          refresh if @read_lock.synchronize { @lazy && committed? }
           @read_lock.synchronize do
             @write_lock.synchronize do
               @data[key.to_s] = args.last if valid
@@ -288,8 +279,7 @@ module RFFDB
         @saved = false
       elsif structure.key?(key)
         # here is where the lazy-loading happens
-        refresh if @read_lock.synchronize { @lazy } &&
-                   @read_lock.synchronize { committed? }
+        refresh if @read_lock.synchronize { @lazy && committed? }
         @read_lock.synchronize do
           @data[key.to_s]
         end

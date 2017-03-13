@@ -1,7 +1,3 @@
-AllCops:
-  Exclude:
-    - vendor/**
-
 MethodLength:
   Max: 30
 

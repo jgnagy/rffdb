@@ -1,4 +1,5 @@
 module RFFDB
+  # The Document Collection class (like a better Array just for Documents)
   class DocumentCollection
     include Enumerable
     include Comparable
@@ -79,20 +80,17 @@ module RFFDB
     # Merge two collections
     # @return [DocumentCollection]
     def merge(other)
-      if other.is_a?(self.class) && other.type == @type
-        new_list = []
+      raise Exceptions::InvalidInput unless other.is_a?(self.class) && other.type == @type
+      new_list = []
 
-        new_keys = collect(&:id)
-        new_keys += other.collect(&:id)
+      new_keys = collect(&:id)
+      new_keys += other.collect(&:id)
 
-        new_keys.sort.uniq.each do |doc_id|
-          new_list << @type.get(doc_id)
-        end
-
-        self.class.new(new_list, @type)
-      else
-        raise Exceptions::InvalidInput
+      new_keys.sort.uniq.each do |doc_id|
+        new_list << @type.get(doc_id)
       end
+
+      self.class.new(new_list, @type)
     end
 
     # Allow comparison of collection
@@ -132,13 +130,10 @@ module RFFDB
         raise Exceptions::InvalidWhereQuery
       end
       self.class.new(
-        @list.collect do |item|
-          if item.send(attribute).nil?
-            nil
-          else
-            item if item.send(attribute).send(comparison_method.to_sym, value)
-          end
-        end.compact,
+        @list.select do |item|
+          (value.nil? && comparison_method.to_sym == :'==' && item.send(attribute).nil?) ||
+          !item.send(attribute).nil? && item.send(attribute).send(comparison_method.to_sym, value)
+        end,
         @type
       )
     end
