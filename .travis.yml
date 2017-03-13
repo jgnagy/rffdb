@@ -1,0 +1,16 @@
+language: ruby
+rvm:
+- 2.3.3
+- 2.2.6
+- 2.1.10
+- ruby-head
+- jruby-head
+- rbx-2
+deploy:
+  provider: rubygems
+  api_key:
+    secure: lDMZ1ljwn41mtrFM1dQmFYNm23qZFn9/MhRD8AMwGDxIda/qK55FtnUk0pv2X1XfOLwqYnpzrMz2z0CxvrPYju8qJT3QfubEEyXe8UNx/gTQvJNKgGMRHlBqkKmapW0ePcYPMYSzI5xeQQniZ8oe6vGDaibLvXLKt47T1UMrCsNUs3qRWg0BkY0DcqOw/TD8SKNjKDQPc9jnA8NX2DIHo+FcGWy3f9IjeeR72C+PYIRMpFuBIuAOHudjCWxgSf0XGiOVIlaXS1okfrKowPkxo0ojY2N/nSUDneSBVfUTCXSK1DeTtAdI+vJiPc3I2eop1EybAom1uBTKfqUjXmaLc6k8KCBFEeKPnSLbwy7v2rckWXAP/Jdml1BWcC3Ix41AQdTV5VlH7k2cttEXhs73Try+GwQRSKqiFNaOfyZbiA3mDHYxsKV/MUIiBBI4x2j2FYcZYdtRitmKJlmVkr8tbFio715C7fWYwTapecLE8qEUpd07bN34xzkIaC7J1jxR9M/E3Cw63QiU36Czwux9REp/O42873znYKpcGw0+ZqcLO/E2fRo8x2mooaDXbmypC4OqfC/MK2y9IvmyxisJwPy70c6UgpkRNrAcY0/dz1o9sQnt/MzGeaaGMdBNGtxdPyIdRW8K3CxP5oWIP6gemBsvg7SypgwTiB7PAq/CLaM=
+  gem: rffdb
+  on:
+    tags: true
+    repo: jgnagy/rffdb
